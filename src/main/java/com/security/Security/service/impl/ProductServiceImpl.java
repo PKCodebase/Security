@@ -16,6 +16,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
+
     @Override
     public String addProduct(Product product) {
         productRepository.save(product);
@@ -34,23 +35,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String updateProductById(Long id,Product product) {
+    public String updateProductById(Long id, Product product) {
         return productRepository.findById(id)
-                .map(product1 -> {
-                    product1.setName(product.getName());
-                    product1.setPrice(product.getPrice());
-                    productRepository.save(product1);
+                .map(existingProduct -> {
+                    existingProduct.setName(product.getName());
+                    existingProduct.setPrice(product.getPrice());
+                    productRepository.save(existingProduct);
                     return "Product updated successfully";
-
-                }).orElseThrow(()->new ProductNotFoundException("Product not found"));
+                })
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
     }
 
     @Override
     public String deleteProductById(Long id) {
         return productRepository.findById(id)
-                .map(product ->{
-                        productRepository.delete(product);
-                        return "Product deleted successfully";
-                }).orElseThrow(()->new ProductNotFoundException("Product not found"));
+                .map(product -> {
+                    productRepository.delete(product);
+                    return "Product deleted successfully";
+                })
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
     }
 }
